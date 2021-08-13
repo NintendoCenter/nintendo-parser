@@ -8,8 +8,6 @@ type Config struct {
 	RequestInterval    int    `env:"REQUEST_INTERVAL" envDefault:"1"`
 	ParseIntervalHours int    `env:"PARSE_INTERVAL_HOURS" envDefault:"6"`
 	MaxWorkers         int    `env:"MAX_WORKERS" envDefault:"3"`
-	GamesTopic	string `env:"GAMES_TOPIC" envDefault:"sync_games"`
-	QueueAddr	string `env:"QUEUE_ADDR" envDefault:"localhost:4150"`
 }
 
 func NewConfig() (*Config, error) {
