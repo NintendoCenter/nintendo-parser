@@ -18,12 +18,16 @@ func BuildContainer() (*dig.Container, error) {
 		func() *client.Nintendo {
 			return client.NewNintendoClient()
 		},
-		func(cfg *config.Config, l *zap.Logger) *service.WorkScheduler {
+		func(c *client.Nintendo) *service.Parser {
+			return service.NewParser(c)
+		},
+		func(cfg *config.Config, l *zap.Logger, p *service.Parser) *service.WorkScheduler {
 			return service.NewWorkScheduler(
 				cfg.ItemLimit,
 				cfg.MaxWorkers,
 				cfg.RequestInterval,
 				cfg.ParseIntervalHours,
+				p,
 				l,
 			)
 		},

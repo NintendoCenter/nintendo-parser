@@ -9,10 +9,11 @@ type offsetParams struct {
 
 type WorkScheduler struct {
 	itemLimit          int
-	logger             *zap.Logger
 	maxWorkers         int
 	requestInterval    int
 	parseIntervalHours int
+	parser             *Parser
+	logger             *zap.Logger
 }
 
 func NewWorkScheduler(
@@ -20,13 +21,15 @@ func NewWorkScheduler(
 	maxWorkers int,
 	requestInterval int,
 	parseIntervalHours int,
+	parser *Parser,
 	logger *zap.Logger,
 ) *WorkScheduler {
 	return &WorkScheduler{
 		itemLimit:          itemLimit,
-		logger:             logger,
 		maxWorkers:         maxWorkers,
 		requestInterval:    requestInterval,
 		parseIntervalHours: parseIntervalHours,
+		parser:             parser,
+		logger:             logger,
 	}
 }
