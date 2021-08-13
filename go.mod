@@ -8,4 +8,5 @@ require (
 	go.uber.org/dig v1.12.0 // indirect
 	go.uber.org/zap v1.19.0 // indirect
 	golang.org/x/sync v0.0.0-20210220032951-036812b2e83c // indirect
+	google.golang.org/protobuf v1.27.1 // indirect
 )
