@@ -49,7 +49,7 @@ func NewWorkScheduler(
 
 const JobTag = "parser"
 
-func (s *WorkScheduler) Start(ctx context.Context, onGameLoaded func(game *protos.Game)) {
+func (s *WorkScheduler) Start(ctx context.Context, onGameLoaded func(games []*protos.Game)) {
 	cmdChan := make(chan offsetParams, s.maxWorkers)
 	gr, ctx := errgroup.WithContext(ctx)
 	for i := 0; i < s.maxWorkers; i++ {
@@ -70,9 +70,7 @@ func (s *WorkScheduler) Start(ctx context.Context, onGameLoaded func(game *proto
 						continue
 					}
 					s.logger.Debug(fmt.Sprintf("Loaded %d items with offset %d and limit %d", len(gameList), params.offset, params.limit))
-					for _, game := range gameList {
-						onGameLoaded(&game)
-					}
+					onGameLoaded(gameList)
 				}
 			}
 			return nil
