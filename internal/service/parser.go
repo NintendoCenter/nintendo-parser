@@ -1,25 +1,30 @@
 package service
 
 import (
+	"fmt"
+
 	"NintendoCenter/nintendo-parser/internal/client"
 	"NintendoCenter/nintendo-parser/internal/protos"
+	"go.uber.org/zap"
 )
 
 type Parser struct {
+	logger *zap.Logger
 	client client.Client
 }
 
-func NewParser(client client.Client) *Parser {
-	return &Parser{client: client}
+func NewParser(client client.Client, l *zap.Logger) *Parser {
+	return &Parser{client: client, logger: l}
 }
 
 func (p *Parser) ParseGames(offset int, limit int) []protos.Game {
-	list := p.client.GetGameList(offset, limit)
+	list, _ := p.client.GetGameList(offset, limit)
 	result := make([]protos.Game, 0, len(list))
 	if len(list) == 0 {
+		p.logger.Info("got an empty list from the client")
 		return result
 	}
-
+	p.logger.Info(fmt.Sprintf("fetched %d items with offset %d and limit %d", len(list), offset, limit))
 	for _, dto := range list {
 		game := p.mapDtoToMode(dto)
 		result = append(result, game)

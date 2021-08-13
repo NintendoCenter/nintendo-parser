@@ -15,11 +15,11 @@ func BuildContainer() (*dig.Container, error) {
 		func(cfg *config.Config) (*zap.Logger, error) {
 			return NewLogger(cfg.LogLevel)
 		},
-		func() *client.Nintendo {
-			return client.NewNintendoClient()
+		func(l *zap.Logger) *client.Nintendo {
+			return client.NewNintendoClient(l)
 		},
-		func(c *client.Nintendo) *service.Parser {
-			return service.NewParser(c)
+		func(c *client.Nintendo, l *zap.Logger) *service.Parser {
+			return service.NewParser(c, l)
 		},
 		func(cfg *config.Config, l *zap.Logger, p *service.Parser) *service.WorkScheduler {
 			return service.NewWorkScheduler(
