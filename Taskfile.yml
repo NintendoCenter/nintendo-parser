@@ -1,0 +1,7 @@
+version: 3
+
+tasks:
+  proto:
+    desc: Generates source code based on protobuf files
+    cmds:
+      - protoc --go_out=. --go_opt=paths=source_relative internal/protos/*.proto
