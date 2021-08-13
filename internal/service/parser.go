@@ -17,12 +17,12 @@ func NewParser(client client.Client, l *zap.Logger) *Parser {
 	return &Parser{client: client, logger: l}
 }
 
-func (p *Parser) ParseGames(offset int, limit int) ([]protos.Game, error) {
+func (p *Parser) ParseGames(offset int, limit int) ([]*protos.Game, error) {
 	list, err := p.client.GetGameList(offset, limit)
 	if err != nil {
-		return []protos.Game{}, err
+		return []*protos.Game{}, err
 	}
-	result := make([]protos.Game, 0, len(list))
+	result := make([]*protos.Game, 0, len(list))
 	if len(list) == 0 {
 		p.logger.Info("got an empty list from the client")
 		return result, nil
@@ -30,7 +30,7 @@ func (p *Parser) ParseGames(offset int, limit int) ([]protos.Game, error) {
 	p.logger.Info(fmt.Sprintf("fetched %d items with offset %d and limit %d", len(list), offset, limit))
 	for _, dto := range list {
 		game := p.mapDtoToMode(dto)
-		result = append(result, game)
+		result = append(result, &game)
 	}
 
 	return result, nil

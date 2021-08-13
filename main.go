@@ -2,13 +2,13 @@ package main
 
 import (
 	"context"
-	"fmt"
 	"os"
 	"os/signal"
 	"syscall"
 
 	"NintendoCenter/nintendo-parser/internal/protos"
 	"NintendoCenter/nintendo-parser/internal/provider"
+	"NintendoCenter/nintendo-parser/internal/queue/producer"
 	"NintendoCenter/nintendo-parser/internal/service"
 	"go.uber.org/zap"
 )
@@ -21,21 +21,23 @@ func main() {
 	}
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
-	err = container.Invoke(func(s *service.WorkScheduler, l *zap.Logger) {
+	err = container.Invoke(func(s *service.WorkScheduler, p *producer.GameProducer, l *zap.Logger) {
 		go func() {
-			s.Start(ctx, func(game *protos.Game) {
-				l.Info(fmt.Sprintf("got %s (%s) game as parse result", game.Title, game.Id))
+			s.Start(ctx, func(games []*protos.Game) {
+				if err := p.SendGames(games); err != nil {
+					l.Fatal("error on sending games to the queue", zap.Error(err))
+				}
 			})
 		}()
+		signals := make(chan os.Signal, 1)
+		signal.Notify(signals, syscall.SIGTERM, syscall.SIGINT)
+		defer signal.Stop(signals)
+		defer p.Stop()
+
+		<-signals
+		t1.Info("caught system signal. Terminating...")
 	})
 	if err != nil {
 		t1.Fatal("error caught while doing parsing task", zap.Error(err))
 	}
-
-	signals := make(chan os.Signal, 1)
-	signal.Notify(signals, syscall.SIGTERM, syscall.SIGINT)
-	defer signal.Stop(signals)
-
-	<-signals
-	t1.Info("caught system signal. Terminating...")
 }

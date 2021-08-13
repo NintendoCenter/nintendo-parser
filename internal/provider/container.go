@@ -3,6 +3,7 @@ package provider
 import (
 	"NintendoCenter/nintendo-parser/config"
 	"NintendoCenter/nintendo-parser/internal/client"
+	"NintendoCenter/nintendo-parser/internal/queue/producer"
 	"NintendoCenter/nintendo-parser/internal/service"
 	"go.uber.org/dig"
 	"go.uber.org/zap"
@@ -30,6 +31,9 @@ func BuildContainer() (*dig.Container, error) {
 				p,
 				l,
 			)
+		},
+		func(cfg *config.Config, l *zap.Logger) (*producer.GameProducer, error) {
+			return producer.NewProducer(cfg.QueueAddr, cfg.GamesTopic, l)
 		},
 		config.NewConfig,
 	}
